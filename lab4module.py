@@ -15,8 +15,6 @@ def tinh_nguyen_lieu(dau_xanh, thap_cam, deo):
     duong = dau_xanh * 0.04 + thap_cam * 0.06 + deo * 0.05
     # Tính lượng đậu
     dau = dau_xanh * 0.07 + thap_cam * 0.04 + deo * 0.02
-
-    # Kết quả trả về dạng dictionary
     nguyen_lieu = {
         "Đường": duong,
         "Đậu": dau
@@ -112,9 +110,9 @@ def check_history(History):
     if len(History) == 0:
         return "Lịch sử trống, chưa có chức năng nào được chọn"
     else:
-        return "======Lịch sử======\n"
-        for i, j in enumerate(History, start = 1):
-            return f"{i}. {j}\n"
+        print("======Lịch sử======\n")
+        for i, j in enumerate(History, start = 1):#enumerate de dem so thu tu, i la so thu tu, j la gia tri
+             return f"{i}. {j}\n"
 
 def thoi_gian():
-    return datetime.datetime.now().strftime("%d/%M/%Y %H:%M:%S")
+    return datetime.datetime.now().strftime("%d/%M/%Y %H:%M:%S")#lay thoi gian hien tai theo dinh dang ngay/thang/nam gio:phut:giay
