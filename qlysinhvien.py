@@ -1,4 +1,4 @@
-from ... import as svpl
+from lab6module import SinhVienPoly as svpl
 class QuanLySinhVien:
     # Khởi tạo danh sách sinh viên rỗng
     def __init__(self):
@@ -29,7 +29,7 @@ class QuanLySinhVien:
         if not self.danh_sach_sinh_vien:
             print("Danh sách sinh viên rỗng.")
         else:
-            print(f"{Ten Sinh Vien}, {Nganh Hoc}, {Diem}, {Hoc Luc}")
+            print(f"{'Ten Sinh Vien'}, {'Nganh Hoc'}, {'Diem'}, {'Hoc Luc'}")
             for sv in self.danh_sach_sinh_vien:
                 sv.xuat_thong_tin()
     def xuat_dssv_gioi(self):
