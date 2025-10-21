@@ -7,16 +7,8 @@ class NhanVien ():
     
     def set_ma_nv(self, ma_nv):
         self.ma_nv=ma_nv
-    def nhap_thong_tin(self,ds_nhanvien):
+    def nhap_thong_tin(self):
         print("Nhập thông tin :")
-        
-        # while True:
-        #     self.ma_nv = input("Nhập mã nv: ")
-        #     if kiem_tra_trung_ma(self.ma_nv, ds_nhanvien):
-        #         print("Mã nhân viên đã tồn tại, vui lòng nhập mã khác.")
-        #         continue
-        #     else:
-        #         break   
         self.ten_nv = input("Nhập tên nhân viên: ")
         while True:
             try:
@@ -51,8 +43,8 @@ class NhanVienTiepThi(NhanVien):
         self.doanh_so = doanh_so
         self.ti_le_hoa_hong=ti_le_hoa_hong
     
-    def nhap_thong_tin(self,ds_nhanvien):
-        super().nhap_thong_tin(ds_nhanvien)
+    def nhap_thong_tin(self):
+        super().nhap_thong_tin()
         while True:
             try:
                 self.doanh_so=int(input("Nhập doanh số: "))
@@ -76,14 +68,17 @@ class TruongPhong(NhanVien):
         super().__init__(ma_nv, ten_nv, luong_thang)
         self.luong_trach_nhiem=luong_trach_nhiem
         
-    def nhap_thong_tin(self,ds_nhanvien):
-        super().nhap_thong_tin(ds_nhanvien)
+        
+    def nhap_thong_tin(self):
+        super().nhap_thong_tin()
         while True:
             try:
                 self.luong_trach_nhiem = int(input("Nhập lương trách nhiệm: "))
+
                 break
             except ValueError:
                 print("Vui lòng nhập đúng định dạng số")
+            
         return self
         
     def tinh_thu_nhap(self):

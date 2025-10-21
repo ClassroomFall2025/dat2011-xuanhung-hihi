@@ -1,13 +1,37 @@
 from class_manager import * 
-
+import csv
+import os
+import re
 ds_nhanvien ={
         "Hành chính" :[],
         "Tiếp thị" :[],
         "Trưởng phòng": [] 
     }
-hanh_chinh = 0
-tiep_thi = 0
-truong_phong = 0
+
+ds_toanbo_nhanvien = {
+    "Hành chính" :[],
+    "Tiếp thị" :[],
+    "Trưởng phòng": [] 
+}
+
+def get_id(file_name):
+    if  os.path.exists(file_name):
+        with open(file_name, mode = 'r', encoding= 'utf-8') as file:
+            line = csv.reader(file)
+            next(line, None)
+            lst_ma = [(row[0]) for row in line if row]
+            if lst_ma :
+                a = lst_ma[-1]
+                match = re.sub(r"[^/0-9]", "", a)
+                return int(match)
+            else:
+                return 0
+    else : 
+        return 0
+    
+hanh_chinh = get_id("hanh_chinh.csv")
+tiep_thi = get_id("tiep_thi.csv")
+truong_phong = get_id("truong_phong.csv")
 
 def nhap_ds_nv():
     print("Chọn Loại Nhân Viên Muốn Nhập")
@@ -27,67 +51,37 @@ def nhap_ds_nv():
         
         if the_loai == 1:
             global hanh_chinh
-            nhap_nhan_vien = NhanVien().nhap_thong_tin(ds_nhanvien["Hành chính"])
+            nhap_nhan_vien = NhanVien().nhap_thong_tin()
             ma_nv="HC"+str(hanh_chinh+1)
             nhap_nhan_vien.set_ma_nv(ma_nv)
             hanh_chinh+=1
             ds_nhanvien["Hành chính"].append(nhap_nhan_vien)
+            ghi_file_hanh_chinh(nhap_nhan_vien)
+            
             
         elif the_loai == 2:
             global tiep_thi
-            nhap_nhan_vien_tiep_thi = NhanVienTiepThi().nhap_thong_tin(ds_nhanvien["Tiếp thị"])
+            nhap_nhan_vien_tiep_thi = NhanVienTiepThi().nhap_thong_tin()
             ds_nhanvien["Tiếp thị"].append(nhap_nhan_vien_tiep_thi)
             ma_nv="TT"+str(tiep_thi+1)
             nhap_nhan_vien_tiep_thi.set_ma_nv(ma_nv)
             tiep_thi+=1
+            ghi_file_tiep_thi(nhap_nhan_vien_tiep_thi)
             
         elif the_loai == 3:
             global truong_phong
-            nhap_truong_phong = TruongPhong().nhap_thong_tin(ds_nhanvien["Trưởng phòng"])
+            nhap_truong_phong = TruongPhong().nhap_thong_tin()
             ds_nhanvien["Trưởng phòng"].append(nhap_truong_phong)
             ma_nv="TP"+str(truong_phong+1)
             nhap_truong_phong.set_ma_nv(ma_nv)
             truong_phong+=1
+            ghi_file_truong_phong(nhap_truong_phong)
             
         elif the_loai ==0 :
             break
         else:
             print("Vui lòng nhập lại lựa chọn 1, 2, 3 để nhập danh sách nhân viên hoặc 0 để thoát")
     return ds_nhanvien
-
-def ghi_file():
-    dinh_dang_file=".txt"
-    try:
-        print("Đang ghi file...")
-        with open(file= "danhsach_nhanvien"+ dinh_dang_file, mode="a", encoding= 'utf8') as file:            
-            for loai,danh_sach in ds_nhanvien.items():
-                file.write(f"\n Loại nhân viên: {loai}\n")
-                if loai == "Hành chính":
-                    file.write("="*55+"\n")
-                    file.write(f"| {'Mã NV':^10} | {'Tên NV':^20} | {'Lương':^15} |\n")
-                    file.write("-"*55+"\n")
-                elif loai == "Tiếp thị":
-                    file.write("="*91+"\n")
-                    file.write(f"| {'Mã NV':^10} | {'Tên NV':^20} | {'Lương':^15} | {'Doanh số':^15} | {'Tỉ lệ hoa hồng':^15} |\n")
-                    file.write("-"*91+"\n")
-                elif loai == "Trưởng phòng":
-                    file.write("="*75+"\n")
-                    file.write(f"| {'Mã NV':^10} | {'Tên NV':^20} | {'Lương':^15} | {'Lương trách nhiệm':^17} |\n")
-                    file.write("-"*75+"\n")
-                for nv in danh_sach:
-                    file.write(nv.xuat_thong_tin())   
-                    file.write("\n") 
-        print("Ghi file thành công!")
-    except ValueError:
-        print("Ghi file không thành công!")
-
-def doc_file(file_name):
-    try:
-        with open(file= file_name, mode="r", encoding= 'utf8') as file:
-            for line in file:
-                print(line)
-    except ValueError:
-        print("Đọc file không thành công")
 
 #Mới thêm cái này (xuất nhân viên theo loại ,truyên vào loại và danh sách theo loại đó để xuất ra theo định dạng tương ứng)
 def xuat_ds_theo_loai(loai,danh_sach: list):
@@ -149,13 +143,23 @@ def xuat_ds_theo_phong_ban(ds : dict):
             case 0:
                 break
 
-# đã sửa cái này theo cái trên (xuất toàn bộ danh sách nhân viên theo loại)        
-def xuat_ds(danh_sach_nhan_vien: dict  ):
+# đã sửa cái này theo cái trên (xuất toàn bộ danh sách nhân viên theo loại)  
+def nap_du_lieu():
+    global tmp
+    tmp = {"Hành chính": [], "Tiếp thị": [], "Trưởng phòng": []}
+    doc_file("hanh_chinh.csv")
+    doc_file("tiep_thi.csv")
+    doc_file("truong_phong.csv")
+    ds_toanbo_nhanvien.clear()
+    ds_toanbo_nhanvien.update(tmp)
+    
+    
+def xuat_ds():
     print("="* 30 ,"DANH SÁCH NHÂN VIÊN", "="*30)
-    for loai,danh_sach in danh_sach_nhan_vien.items():
+    for loai,danh_sach in ds_toanbo_nhanvien.items():
         xuat_ds_theo_loai(loai,danh_sach)
        
-def tim_nv_theo_luong (ds_nhanvien :dict):
+def tim_nv_theo_luong ():
     tim_kiem_nv_theo_luong = []
     while True:
         try:
@@ -171,17 +175,17 @@ def tim_nv_theo_luong (ds_nhanvien :dict):
         except ValueError:
             print("Mức lương nhập không hợp lệ, vui lòng nhập lại")
             
-    for loai_nv in ds_nhanvien.values():
+    for loai_nv in ds_toanbo_nhanvien.values():
         for employee in loai_nv:
             if min_sal <= employee.tinh_thu_nhap() <= max_sal:
                 tim_kiem_nv_theo_luong.append(employee)
-        else:
-            print(f"Không tìm thấy nhân viên trong khoảng mức lương từ {min_sal:,} tới {max_sal:,}!")
+    if not tim_kiem_nv_theo_luong:
+        print(f"Không tìm thấy nhân viên trong khoảng mức lương từ {min_sal:,} tới {max_sal:,}!")
     return tim_kiem_nv_theo_luong
 
 def tim_nv_theo_ma():
-    ma_nv = input("Nhập mã nhân viên: ")
-    for loai, danh_sach in ds_nhanvien.items():
+    ma_nv = input("Nhập mã nhân viên: ").upper()
+    for loai, danh_sach in ds_toanbo_nhanvien.items():
         for nv in danh_sach:
             if nv.ma_nv == ma_nv:
                 return nv, loai
@@ -219,7 +223,7 @@ def tim_kiem_nhan_vien():
         else:
             print("Không tìm thấy nhân viên trong danh sách.")
     else :
-        list_tim_kiem =tim_nv_theo_luong(ds_nhanvien)
+        list_tim_kiem =tim_nv_theo_luong()
         for nv in list_tim_kiem:
             if isinstance(nv, NhanVienTiepThi):
                 kq_tim_kiem["Tiếp thị"].append(nv)
@@ -232,11 +236,11 @@ def tim_kiem_nhan_vien():
 def xoa_nv_theo_ma():
     result, loai = tim_nv_theo_ma()
     if result is not None:
-        for loai_nhanvien in ds_nhanvien.keys():
-            for nv in ds_nhanvien[loai_nhanvien]:
+        for loai_nhanvien in ds_toanbo_nhanvien.keys():
+            for nv in ds_toanbo_nhanvien[loai_nhanvien]:
                 if result.ma_nv == nv.ma_nv:
                     print(f"Đã xóa nhân viên mã {result.ma_nv}")
-                    ds_nhanvien[loai_nhanvien].remove(result)
+                    ds_toanbo_nhanvien[loai_nhanvien].remove(result)
                     return
     else:
         print("Không có nhân viên cần xóa trong danh sách!")  
@@ -244,13 +248,13 @@ def xoa_nv_theo_ma():
             
 def sap_xep_nv_theo_thu_nhap():
     check = {}
-    for loai, ds_nv in ds_nhanvien.items():
+    for loai, ds_nv in ds_toanbo_nhanvien.items():
         check[loai] = sorted(ds_nv, key=lambda nv:nv.tinh_thu_nhap(), reverse= True)
     return check
 
 def sap_xep_nv_theo_ho_ten():
     check = {}
-    for loai, ds_nv in ds_nhanvien.items():
+    for loai, ds_nv in ds_toanbo_nhanvien.items():
         check[loai] = sorted(ds_nv, key=lambda nv:nv.ten_nv, reverse= False)
     return check
 
@@ -270,35 +274,42 @@ def sap_xep_nv():
             print("Lựa chọn không hợp lệ ! Vui lòng nhập lại lựa chọn.")
     if sap_xep == 1:
         kqua_sap_xep=sap_xep_nv_theo_ho_ten()
+        print("Đã sắp xếp theo tên")
     elif sap_xep == 2:
         kqua_sap_xep=sap_xep_nv_theo_thu_nhap()
+        print("Đã sắp xếp theo thu nhập")
     else:
         print("Thoát sắp xếp")
-    return kqua_sap_xep
+    print("Kết quả:")
+    xuat_ds_theo_phong_ban(kqua_sap_xep)
+    
+    # ds_toanbo_nhanvien.clear()
+    # ds_toanbo_nhanvien.update(kqua_sap_xep)
+    # return kqua_sap_xep
 
 def xuat_5_nv_thu_nhap_cao_nhat():
     check =[]
-    for ds_nhan_vien in ds_nhanvien.values():
+    for ds_nhan_vien in ds_toanbo_nhanvien.values():
         for nhan_vien in ds_nhan_vien:
             check.append(nhan_vien)
     sort_lst= sorted(check, key=lambda nv:nv.tinh_thu_nhap() , reverse= True)
     return sort_lst[:5]
 
-def cap_nhat_tt_theo_ma(ds_nhanvien):
+def cap_nhat_tt_theo_ma():
     nv_can_sua, loai = tim_nv_theo_ma()
     if nv_can_sua is not None:
         
             #Nhap ten moi
             print(f"Tìm thấy nhân viên tên:{nv_can_sua.ten_nv} thuộc loại: {loai}")
             ten_moi = input("Nhập tên mới ( hoặc nhập q để bỏ qua):")
-            if ten_moi.strip() and ten_moi != "q":
+            if ten_moi.strip() and ten_moi.lower() != "q":
                 nv_can_sua.ten_nv = ten_moi
                 
             #Nhap luong moi
             while True:
                 luong_moi = input("Nhập lương mới (hoặc nhập q để bỏ qua): ")
                 try:
-                    if luong_moi.strip() and luong_moi != "q":
+                    if luong_moi.strip() and luong_moi.lower() != "q":
                         nv_can_sua.luong_thang = int(luong_moi)
                     break
                 except ValueError:
@@ -310,7 +321,7 @@ def cap_nhat_tt_theo_ma(ds_nhanvien):
                 #Sua lai doanh so
                 dso_moi = input("Nhập doanh số mới (hoặc nhập q để bỏ qua): ")
                 while True:
-                    if dso_moi.strip() and dso_moi != "q":
+                    if dso_moi.strip() and dso_moi.lower() != "q":
                         nv_can_sua.doanh_so = int(dso_moi)
                         break
                     else:
@@ -320,7 +331,7 @@ def cap_nhat_tt_theo_ma(ds_nhanvien):
                 #Sua lai ty le hoa hong
                 hoa_hong_moi = input("Nhập tỷ lệ hoa hồng mới (hoặc nhập q để bỏ qua):")
                 while True:
-                    if hoa_hong_moi.strip() and hoa_hong_moi != "q":
+                    if hoa_hong_moi.strip() and hoa_hong_moi.lower() != "q":
                         nv_can_sua.ti_le_hoa_hong = int(hoa_hong_moi)
                         break
                     else:
@@ -332,15 +343,101 @@ def cap_nhat_tt_theo_ma(ds_nhanvien):
                 #Sua lai luong trach nhiem
                 luong_trach_nhiem_moi = input("Nhập lương trách nhiệm mới (hoặc nhập q để bỏ qua): ")
                 while True:
-                    if luong_trach_nhiem_moi.strip() and luong_trach_nhiem_moi != "q":
+                    if luong_trach_nhiem_moi.strip() and luong_trach_nhiem_moi.lower() != "q":
                         nv_can_sua.luong_trach_nhiem = int(luong_trach_nhiem_moi)
                         break
                     else:
                         print("Giá trị không hợp lệ, vui lòng nhập lại")
                 
             print("\n")
-            xuat_ds(ds_nhanvien)
+            xuat_ds()
     else:
         print("Không tìm thấy nhân viên trong danh sách.")
+        
+        
+def ghi_toanbo_file():
+    for loai, danhsach in ds_toanbo_nhanvien.items():
+        if loai == "Hành chính":
+            with open("hanh_chinh.csv", 'w', encoding='utf-8') as file:
+                file.write("Ma_nhanvien,Ten_nhanvien,Luong_nv\n")
+                for nv in danhsach:
+                    file.write(f"{nv.ma_nv},{nv.ten_nv},{nv.luong_thang}\n")
+            
+        elif  loai == "Tiếp thị":
+            with open("tiep_thi.csv", 'w', encoding='utf-8') as file:
+                file.write("Ma_nhanvien,Ten_nhanvien,Luong_nv,Doanh_so,Ty_le_hoa_hong\n")
+                for nv in danhsach:
+                    file.write(f"{nv.ma_nv},{nv.ten_nv},{nv.luong_thang},{nv.doanh_so},{nv.ti_le_hoa_hong}\n")
+        else:
+            with open("truong_phong.csv", 'w', encoding='utf-8') as file:
+                file.write("Ma_nhanvien,Ten_nhanvien,Luong_thang,luong_trach_nhiem\n")
+                for nv in danhsach:  
+                    file.write(f"{nv.ma_nv},{nv.ten_nv},{nv.luong_thang},{nv.luong_trach_nhiem}\n")
+
     
+def ghi_file_hanh_chinh(nv):
+    import os
+    if os.path.exists('hanh_chinh.csv'):
+        with open("hanh_chinh.csv", 'a', encoding='utf-8') as file:
+            file.write(f"{nv.ma_nv},{nv.ten_nv},{nv.luong_thang}\n")
+    else:
+        with open("hanh_chinh.csv", 'w', encoding='utf-8') as file:
+            file.write("Ma_nhanvien,Ten_nhanvien,Luong_nv\n")
+            file.write(f"{nv.ma_nv},{nv.ten_nv},{nv.luong_thang}\n")
+            
+def ghi_file_tiep_thi(nv):
+    import os
+    if os.path.exists('tiep_thi.csv'):
+        with open("tiep_thi.csv", 'a', encoding='utf-8') as file:
+            file.write(f"{nv.ma_nv},{nv.ten_nv},{nv.luong_thang},{nv.doanh_so},{nv.ti_le_hoa_hong}\n")
+    else:
+        with open("tiep_thi.csv", 'w', encoding='utf-8') as file:
+            file.write("Ma_nhanvien,Ten_nhanvien,Luong_nv,Doanh_so,Ty_le_hoa_hong\n")
+            file.write(f"{nv.ma_nv},{nv.ten_nv},{nv.luong_thang},{nv.doanh_so},{nv.ti_le_hoa_hong}\n")
+            
+def ghi_file_truong_phong(nv):
+    import os
+    if os.path.exists('truong_phong.csv'):
+        with open("truong_phong.csv", 'a', encoding='utf-8') as file:
+            file.write(f"{nv.ma_nv},{nv.ten_nv},{nv.luong_thang},{nv.luong_trach_nhiem}\n")
+    else:
+        with open("truong_phong.csv", 'w', encoding='utf-8') as file:
+            file.write("Ma_nhanvien,Ten_nhanvien,Luong_thang,luong_trach_nhiem\n")   
+            file.write(f"{nv.ma_nv},{nv.ten_nv},{nv.luong_thang},{nv.luong_trach_nhiem}\n")  
+            
+def doc_file(file_name):
+    # if ds_toanbo_nhanvien is None:
+    #     ds_toanbo_nhanvien = {
+    #         "Hành chính": [],
+    #         "Tiếp thị": [],
+    #         "Trưởng phòng": []
+    #     }
     
+    with open(file_name,"r",encoding="utf-8") as file:
+        ds = csv.DictReader(file)
+        if file_name == "hanh_chinh.csv":
+            for row in ds:
+                nv = NhanVien(ma_nv=row["Ma_nhanvien"],
+                            ten_nv=row["Ten_nhanvien"],
+                            luong_thang=int(row["Luong_nv"]))
+                
+                tmp["Hành chính"].append(nv)
+        elif file_name == "tiep_thi.csv":
+            for row in ds:
+                nv = NhanVienTiepThi(ma_nv=row["Ma_nhanvien"],
+                            ten_nv=row["Ten_nhanvien"],
+                            luong_thang=int(row["Luong_nv"]),
+                            doanh_so=int(row["Doanh_so"]),
+                            ti_le_hoa_hong=float(row["Ty_le_hoa_hong"]))
+                tmp["Tiếp thị"].append(nv)
+        else:
+            for row in ds:
+                nv = TruongPhong(ma_nv=row["Ma_nhanvien"],
+                            ten_nv=row["Ten_nhanvien"],
+                            luong_thang=int(row["Luong_thang"].strip()),
+                            luong_trach_nhiem=int(row["luong_trach_nhiem"]))
+                tmp["Trưởng phòng"].append(nv)
+    return tmp
+    
+
+

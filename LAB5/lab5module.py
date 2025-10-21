@@ -17,16 +17,18 @@ class SanPham:
         self.__giam_gia = giam_gia
     def nhap(self):
         ten_sp = input("Nhập tên sản phẩm: ")
+        gia_sp = float(input("Nhap gia san pham: "))   
+        giam_gia = float(input("Nhap gia duoc giam: "))  
         self.set_ten(ten_sp)
-        self.gia = float(input("Nhập đơn giá: "))
-        self.giam_gia = float(input("Nhập giảm giá: "))
+        self.set_gia(gia_sp)
+        self.set_giam_gia(giam_gia)
 
     def thue_nhap_khau(self):
-        return self.get_gia(self) * 0.1# 10% thuế nhập khẩu
+        return self.get_gia() * 0.1# 10% thuế nhập khẩu
 
     def xuat_thong_tin(self):
         print("Tên sản phẩm:", self.get_ten())
-        print("Đơn giá:", self.gia)
-        print("Giảm giá:", self.giam_gia)
+        print("Đơn giá:", self.get_gia())
+        print("Giảm giá:", self.get_giam_gia())
         print("Thuế nhập khẩu:", self.thue_nhap_khau())
-        print("Giá cuối:", self.gia - self.giam_gia + self.thue_nhap_khau())# Giá cuối = Giá - Giảm giá + Thuế nhập khẩu
+        print("Giá cuối:", self.get_gia() - self.get_giam_gia() + self.thue_nhap_khau())# Giá cuối = Giá - Giảm giá + Thuế nhập khẩu
