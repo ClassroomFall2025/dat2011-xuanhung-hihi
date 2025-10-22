@@ -1,0 +1,68 @@
+from mainfunction import *
+
+menu_list = {
+    0: "Thoát chương trình",
+    1: "Nhập danh sách nhân viên từ bàn phím và lưu vào file",
+    2: "Đọc thông tin nhân viên từ file và xuất danh sách",
+    3: "Tìm kiếm nhân viên",
+    4: "Xóa nhân viên theo mã",
+    5: "Cập nhật thông tin nhân viên theo mã",
+    6: "Sắp xếp danh sách nhân viên",
+    7: "Xuất 5 nhân viên có thu nhập cao nhất",
+    8: "Xuất nhân viên theo phòng ban"  
+}
+
+def menu():
+    while True:
+        print("="*24+"MENU CHƯƠNG TRÌNH"+"="*23)
+        for key, value in menu_list.items():
+            print(f"| {key} : {value} {(55 - len(value)) * ' '} |")
+        print("="*64)  
+              
+        while True:
+            try:
+                lua_chon = int(input("Nhập lựa chọn của bạn từ 0 - 8: "))
+                break
+            except ValueError:
+                print("Lựa chọn không hợp lệ,vui lòng nhập lại lựa chọn")
+                
+        match lua_chon:
+            case 0:
+                print("Cảm ơn đã sử dụng chương trình!")
+                break
+            case 1:
+                nhap_ds_nv()
+                nap_du_lieu()
+            case 2:
+                nap_du_lieu()
+                xuat_ds(ds_toanbo_nhanvien)   
+            case 3:
+                ds_timkiem=tim_kiem_nhan_vien()
+                if ds_timkiem:
+                    xuat_ds(ds_timkiem)
+                else:
+                    print("Không tìm thấy nhân viên nào!")
+            case 4:
+                xoa_nv_theo_ma()
+                ghi_toanbo_file()  
+                nap_du_lieu()  
+            case 5:
+                cap_nhat_tt_theo_ma() 
+                ghi_toanbo_file()
+                nap_du_lieu()  
+            case 6:
+                sap_xep_nv()
+                ghi_toanbo_file()  
+            case 7:
+                result = xuat_5_nv_thu_nhap_cao_nhat()
+                
+                for i in result:
+                    print("="*60+"")
+                    print(f"| {'Mã NV':^10} | {'Tên NV':^20} | {'Lương':^20} |" )
+                    print(i.xuat_thong_tin_co_ban())
+            case 8:
+                xuat_ds_theo_phong_ban(ds_toanbo_nhanvien)
+            case _:
+                print("Lựa chọn không hợp lệ.")
+
+menu()
