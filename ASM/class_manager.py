@@ -9,6 +9,14 @@ class NhanVien ():
         self.ma_nv=ma_nv
     def nhap_thong_tin(self):
         print("Nhập thông tin :")
+        
+        # while True:
+        #     self.ma_nv = input("Nhập mã nv: ")
+        #     if kiem_tra_trung_ma(self.ma_nv, ds_nhanvien):
+        #         print("Mã nhân viên đã tồn tại, vui lòng nhập mã khác.")
+        #         continue
+        #     else:
+        #         break   
         self.ten_nv = input("Nhập tên nhân viên: ")
         while True:
             try:
