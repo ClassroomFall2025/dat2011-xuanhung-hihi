@@ -154,9 +154,9 @@ def nap_du_lieu():
     ds_toanbo_nhanvien.update(tmp)
     
     
-def xuat_ds():
+def xuat_ds(ds:dict):
     print("="* 30 ,"DANH SÁCH NHÂN VIÊN", "="*30)
-    for loai,danh_sach in ds_toanbo_nhanvien.items():
+    for loai,danh_sach in ds.items():
         xuat_ds_theo_loai(loai,danh_sach)
        
 def tim_nv_theo_luong ():
@@ -321,20 +321,22 @@ def cap_nhat_tt_theo_ma():
                 #Sua lai doanh so
                 dso_moi = input("Nhập doanh số mới (hoặc nhập q để bỏ qua): ")
                 while True:
-                    if dso_moi.strip() and dso_moi.lower() != "q":
-                        nv_can_sua.doanh_so = int(dso_moi)
+                    try:
+                        if dso_moi.strip() and dso_moi.lower() != "q":
+                            nv_can_sua.doanh_so = int(dso_moi)
                         break
-                    else:
+                    except ValueError:
                         print("Giá trị không hợp lệ, vui lòng nhập lại")
                 
                     
                 #Sua lai ty le hoa hong
                 hoa_hong_moi = input("Nhập tỷ lệ hoa hồng mới (hoặc nhập q để bỏ qua):")
                 while True:
-                    if hoa_hong_moi.strip() and hoa_hong_moi.lower() != "q":
-                        nv_can_sua.ti_le_hoa_hong = int(hoa_hong_moi)
+                    try:
+                        if hoa_hong_moi.strip() and hoa_hong_moi.lower() != "q":
+                            nv_can_sua.ti_le_hoa_hong = float(hoa_hong_moi)/100
                         break
-                    else:
+                    except ValueError:
                         print("Giá trị không hợp lệ, vui lòng nhập lại")
                 
                     
@@ -343,14 +345,14 @@ def cap_nhat_tt_theo_ma():
                 #Sua lai luong trach nhiem
                 luong_trach_nhiem_moi = input("Nhập lương trách nhiệm mới (hoặc nhập q để bỏ qua): ")
                 while True:
-                    if luong_trach_nhiem_moi.strip() and luong_trach_nhiem_moi.lower() != "q":
-                        nv_can_sua.luong_trach_nhiem = int(luong_trach_nhiem_moi)
+                    try:
+                        if luong_trach_nhiem_moi.strip() and luong_trach_nhiem_moi.lower() != "q":
+                            nv_can_sua.luong_trach_nhiem = int(luong_trach_nhiem_moi)
                         break
-                    else:
+                    except ValueError:
                         print("Giá trị không hợp lệ, vui lòng nhập lại")
                 
-            print("\n")
-            xuat_ds()
+            print("Đã cập nhật thông tin\n")
     else:
         print("Không tìm thấy nhân viên trong danh sách.")
         
@@ -412,32 +414,33 @@ def doc_file(file_name):
     #         "Tiếp thị": [],
     #         "Trưởng phòng": []
     #     }
+    if os.path.exists(file_name):
+        with open(file_name,"r",encoding="utf-8") as file:
+            ds = csv.DictReader(file)
+            if file_name == "hanh_chinh.csv":
+                for row in ds:
+                    nv = NhanVien(ma_nv=row["Ma_nhanvien"],
+                                ten_nv=row["Ten_nhanvien"],
+                                luong_thang=int(row["Luong_nv"]))
+                    
+                    tmp["Hành chính"].append(nv)
+            elif file_name == "tiep_thi.csv":
+                for row in ds:
+                    nv = NhanVienTiepThi(ma_nv=row["Ma_nhanvien"],
+                                ten_nv=row["Ten_nhanvien"],
+                                luong_thang=int(row["Luong_nv"]),
+                                doanh_so=int(row["Doanh_so"]),
+                                ti_le_hoa_hong=float(row["Ty_le_hoa_hong"]))
+                    tmp["Tiếp thị"].append(nv)
+            else:
+                for row in ds:
+                    nv = TruongPhong(ma_nv=row["Ma_nhanvien"],
+                                ten_nv=row["Ten_nhanvien"],
+                                luong_thang=int(row["Luong_thang"].strip()),
+                                luong_trach_nhiem=int(row["luong_trach_nhiem"]))
+                    tmp["Trưởng phòng"].append(nv)
+        return tmp
     
-    with open(file_name,"r",encoding="utf-8") as file:
-        ds = csv.DictReader(file)
-        if file_name == "hanh_chinh.csv":
-            for row in ds:
-                nv = NhanVien(ma_nv=row["Ma_nhanvien"],
-                            ten_nv=row["Ten_nhanvien"],
-                            luong_thang=int(row["Luong_nv"]))
-                
-                tmp["Hành chính"].append(nv)
-        elif file_name == "tiep_thi.csv":
-            for row in ds:
-                nv = NhanVienTiepThi(ma_nv=row["Ma_nhanvien"],
-                            ten_nv=row["Ten_nhanvien"],
-                            luong_thang=int(row["Luong_nv"]),
-                            doanh_so=int(row["Doanh_so"]),
-                            ti_le_hoa_hong=float(row["Ty_le_hoa_hong"]))
-                tmp["Tiếp thị"].append(nv)
-        else:
-            for row in ds:
-                nv = TruongPhong(ma_nv=row["Ma_nhanvien"],
-                            ten_nv=row["Ten_nhanvien"],
-                            luong_thang=int(row["Luong_thang"].strip()),
-                            luong_trach_nhiem=int(row["luong_trach_nhiem"]))
-                tmp["Trưởng phòng"].append(nv)
-    return tmp
-    
+       
 
 

@@ -34,24 +34,20 @@ def menu():
                 nhap_ds_nv()
                 nap_du_lieu()
             case 2:
-                xuat_ds()   
+                nap_du_lieu()
+                xuat_ds(ds_toanbo_nhanvien)   
             case 3:
                 ds_timkiem=tim_kiem_nhan_vien()
-                print("=============== Danh Sách Tìm Kiếm ============")
-                if not (ds_timkiem["Hành chính"]==[] and ds_timkiem["Tiếp thị"]==[] and ds_timkiem["Trưởng phòng"]==[]):
-                    if ds_timkiem["Hành chính"] != []:
-                        xuat_ds_theo_loai("Hành chính",ds_timkiem["Hành chính"])
-                    if ds_timkiem["Tiếp thị"] != []:
-                        xuat_ds_theo_loai("Tiếp thị",ds_timkiem["Tiếp thị"])
-                    if ds_timkiem["Trưởng phòng"] != []:
-                        xuat_ds_theo_loai("Trưởng phòng",ds_timkiem["Trưởng phòng"])
+                if ds_timkiem:
+                    xuat_ds(ds_timkiem)
+                else:
+                    print("Không tìm thấy nhân viên nào!")
             case 4:
                 xoa_nv_theo_ma()
                 ghi_toanbo_file()  
                 nap_du_lieu()  
             case 5:
-                print(ds_toanbo_nhanvien["Hành chính"])
-                cap_nhat_tt_theo_ma(ds_toanbo_nhanvien) 
+                cap_nhat_tt_theo_ma() 
                 ghi_toanbo_file()
                 nap_du_lieu()  
             case 6:
